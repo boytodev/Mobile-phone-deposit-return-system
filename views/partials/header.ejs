@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | ระบบฝาก-คืนมือถือ</title>
+    <link rel="stylesheet" href="/css/style.css"> <style>
+      body { font-family: sans-serif; margin: 20px; }
+      nav a { margin-right: 15px; text-decoration: none; }
+      .container { max-width: 800px; margin: auto; }
+      .qr-code img { border: 1px solid #ccc; margin-top: 10px; }
+      #qr-reader { width: 500px; border: 1px solid #ccc; margin: 20px auto; } /* Style the scanner */
+      #scan-result { margin-top: 15px; padding: 10px; border-radius: 5px; }
+      .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+      .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
+      .info { background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+      table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+      th, td { border: 1px solid #ddd; padding: 8px; text-align: left;}
+      th { background-color: #f2f2f2; }
+      button, input[type=submit] { padding: 10px 15px; cursor: pointer; }
+      .form-group { margin-bottom: 15px; }
+      .form-group label { display: block; margin-bottom: 5px; }
+      .form-group input { width: 100%; padding: 8px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+        <a href="/">หน้าสแกน</a> |
+        <a href="/students">รายชื่อนักเรียน</a> |
+        <a href="/students/add">เพิ่มนักเรียน</a> |
+        <a href="/status">ข้อมูลฝาก-คืน</a> 
+    </nav>
+    <hr>
+    <h1><%= title %></h1>

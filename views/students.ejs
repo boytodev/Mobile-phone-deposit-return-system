@@ -1,0 +1,30 @@
+<%- include('partials/header') %>
+
+<% if (students.length > 0) { %>
+    <table>
+        <thead>
+            <tr>
+                <th>รหัสนักเรียน</th>
+                <th>ชื่อ</th>
+                <th>นามสกุล</th>
+                <th>ชั้นเรียน</th>
+                <th>ดูรายละเอียด</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% students.forEach(student => { %>
+                <tr>
+                    <td><%= student.studentId %></td>
+                    <td><%= student.firstName %></td>
+                    <td><%= student.lastName %></td>
+                    <td><%= student.grade || '-' %></td>
+                    <td><a href="/students/<%= student.studentId %>">ดู QR Code</a></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+<% } else { %>
+    <p>ยังไม่มีข้อมูลนักเรียนในระบบ</p>
+<% } %>
+
+<%- include('partials/footer') %>

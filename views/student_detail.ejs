@@ -1,0 +1,14 @@
+<%- include('partials/header') %>
+
+<h2>ข้อมูลนักเรียน</h2>
+<p><strong>รหัสนักเรียน:</strong> <%= student.studentId %></p>
+<p><strong>ชื่อ:</strong> <%= student.firstName %> <%= student.lastName %></p>
+<p><strong>ชั้นเรียน:</strong> <%= student.grade || 'ไม่ได้ระบุ' %></p>
+
+<h2>QR Code (สำหรับสแกนฝาก/คืน)</h2>
+<p>ให้นักเรียนใช้ QR Code นี้ หรือพิมพ์ติดบัตร</p>
+<div class="qr-code">
+     <img src="<%= qrCodeDataUrl %>" alt="QR Code for <%= student.studentId %>">
+</div>
+
+<%- include('partials/footer') %>

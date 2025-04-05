@@ -1,0 +1,71 @@
+<%# views/status.ejs %>
+
+<%- include('partials/header') %>
+<%# เพิ่มไฟล์css %>
+<link rel="stylesheet" href="/public/css/style.css">
+
+<%# เพิ่มปุ่มพิมพ์ ไว้ก่อนตาราง %>
+<button type="button" id="printButton" style="padding: 8px 15px; margin-bottom: 20px; cursor: pointer; font-size: 1rem;">
+    🖨️ พิมพ์ข้อมูลหน้านี้
+</button>
+
+<% if (logs && logs.length > 0) { %>
+    <p>ข้อมูล ณ วันที่: <%= currentDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }) %></p>
+    <%# เพิ่ม div ครอบตารางเพื่อช่วยในการจัดสไตล์ตอนพิมพ์ %>
+    <div id="printableArea">
+        <table>
+            <thead>
+                <tr>
+                    <th>ลำดับ</th>
+                    <th>รหัสนักเรียน</th>
+                    <th>ชื่อ - สกุล</th>
+                    <th>สถานะปัจจุบัน</th>
+                    <th>เวลาดำเนินการล่าสุด</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% logs.forEach((log, index) => { %>
+                    <% if (log.student) { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= log.student.studentId %></td>
+                            <td><%= log.student.firstName %> <%= log.student.lastName %></td>
+                            <td>
+                                <% if (log.status === 'checked-in') { %>
+                                    <span class="status-in">✅ ฝากอยู่</span>
+                                <% } else if (log.status === 'checked-out') { %>
+                                    <span class="status-out">❌ คืนแล้ว</span>
+                                <% } else { %>
+                                    <%= log.status %>
+                                <% } %>
+                            </td>
+                            <td>
+                                <%= new Date(log.updatedAt).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'medium' }) %>
+                            </td>
+                        </tr>
+                    <% } else { %>
+                         <tr>
+                            <td><%= index + 1 %></td>
+                            <td colspan="4" style="color: grey;"><i>ข้อมูลนักเรียนไม่สมบูรณ์สำหรับ Log นี้</i></td>
+                        </tr>
+                    <% } %>
+                <% }); %>
+            </tbody>
+        </table>
+    </div> <%# ปิด div#printableArea %>
+<% } else { %>
+    <p>ยังไม่มีข้อมูลการฝาก-คืนในระบบ ณ วันที่ <%= currentDate.toLocaleDateString('th-TH') %></p>
+<% } %>
+
+<%- include('partials/footer') %>
+
+<%# เพิ่ม JavaScript ท้ายไฟล์ %>
+<script>
+    const printBtn = document.getElementById('printButton');
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            // สั่งให้ Browser เปิดหน้าต่าง Print Dialog
+            window.print();
+        });
+    }
+</script>

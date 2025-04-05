@@ -1,0 +1,27 @@
+<%- include('partials/header') %>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="error"><%= error %></div>
+<% } %>
+
+<form action="/students/add" method="POST">
+    <div class="form-group">
+        <label for="studentId">รหัสนักเรียน (สำหรับ QR Code):</label>
+        <input type="text" id="studentId" name="studentId" required>
+    </div>
+    <div class="form-group">
+        <label for="firstName">ชื่อ:</label>
+        <input type="text" id="firstName" name="firstName" required>
+    </div>
+    <div class="form-group">
+        <label for="lastName">นามสกุล:</label>
+        <input type="text" id="lastName" name="lastName" required>
+    </div>
+    <div class="form-group">
+        <label for="grade">ชั้นเรียน (ถ้ามี):</label>
+        <input type="text" id="grade" name="grade">
+    </div>
+    <button type="submit">เพิ่มนักเรียน</button>
+</form>
+
+<%- include('partials/footer') %>

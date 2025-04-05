@@ -1,0 +1,97 @@
+/* ในไฟล์ public/css/style.css หรือใน <style> tag */
+
+/* --- Print Specific Styles --- */
+@media print {
+
+    /* ซ่อนส่วนที่ไม่ต้องการพิมพ์ */
+    nav,             /* ซ่อน Navigation */
+    footer,          /* ซ่อน Footer */
+    #printButton,    /* ซ่อนปุ่มพิมพ์เอง */
+    script           /* ซ่อน Script Tags */
+    {
+        display: none !important; /* ใช้ !important เพื่อให้แน่ใจว่าถูกซ่อน */
+    }
+
+    /* ปรับ Layout โดยรวมสำหรับการพิมพ์ */
+    body {
+        font-family: 'Sarabun', sans-serif; /* หรือฟอนต์อื่นที่รองรับภาษาไทย */
+        font-size: 10pt; /* ลดขนาดฟอนต์ลงเล็กน้อย */
+        margin: 1cm; /* กำหนดขอบกระดาษ */
+        color: #000; /* ทำให้ตัวหนังสือเป็นสีดำ */
+        background-color: #fff; /* พื้นหลังสีขาว */
+    }
+
+    .container {
+        max-width: none; /* ไม่จำกัดความกว้าง container */
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    /* จัดรูปแบบหัวข้อหลัก */
+    h1 {
+        font-size: 16pt;
+        text-align: center;
+        margin-bottom: 1cm;
+    }
+
+    /* จัดรูปแบบวันที่ */
+     p {
+         text-align: right;
+         margin-bottom: 0.5cm;
+         font-size: 9pt;
+     }
+
+    /* จัดรูปแบบตารางสำหรับการพิมพ์ */
+    #printableArea { /* จัดการเฉพาะส่วนที่ต้องการพิมพ์ */
+        display: block !important; /* ทำให้แสดงผล */
+    }
+
+    table {
+        width: 100%;
+        border: 1px solid #333; /* เส้นขอบตารางเข้มขึ้น */
+        border-collapse: collapse;
+        margin-top: 0; /* ไม่ต้องมี margin ด้านบน */
+        page-break-inside: auto; /* อนุญาตให้ตารางแบ่งหน้าได้ */
+    }
+
+    thead {
+        display: table-header-group; /* ให้หัวตารางแสดงซ้ำทุกหน้า */
+        background-color: #eee; /* สีพื้นหลังหัวตาราง */
+        font-weight: bold;
+         color: #000;
+    }
+
+    tbody {
+         color: #000;
+    }
+
+    tr {
+        page-break-inside: avoid; /* พยายามไม่ให้แถวแบ่งครึ่งหน้า */
+        page-break-after: auto;
+    }
+
+    th, td {
+        border: 1px solid #666; /* เส้นขอบ cell */
+        padding: 5px 8px; /* ปรับ padding */
+        text-align: left;
+         color: #000; /* ทำให้ตัวหนังสือในตารางเป็นสีดำ */
+    }
+
+    /* จัดการการแสดงผล Status ตอนพิมพ์ (อาจไม่แสดงสี) */
+    .status-in, .status-out {
+        font-weight: normal; /* อาจจะเอา bold ออก */
+        color: #000 !important; /* บังคับสีดำ */
+    }
+     .status-in::before { content: "✅ "; } /* เพิ่มสัญลักษณ์แทนสี */
+     .status-out::before { content: "❌ "; }
+
+
+    /* ลบการตกแต่งลิงก์ (ถ้ามี) */
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+}
