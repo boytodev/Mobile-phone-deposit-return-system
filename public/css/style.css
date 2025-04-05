@@ -95,3 +95,24 @@
         color: inherit;
     }
 }
+
+/* Style เดิมสำหรับ #qr-reader */
+#qr-reader {
+    width: 500px; /* อาจจะใหญ่ไปสำหรับมือถือ */
+    max-width: 90%; /* ทำให้ไม่ล้นจอแนวนอน */
+    border: 1px solid #ccc;
+    margin: 20px auto;
+    background-color: #f0f0f0; /* เพิ่มสีพื้นหลังเล็กน้อย */
+}
+
+/* ใช้ Media Query ปรับขนาดสำหรับจอเล็ก (มือถือ) */
+@media (max-width: 600px) {
+    #qr-reader {
+        width: 95%; /* ทำให้เกือบเต็มความกว้างจอ */
+        /* อาจจะปรับ qrbox ให้เล็กลงด้วย ถ้ากำหนดไว้ใน JS */
+    }
+    /* อาจจะต้องปรับขนาด Font หรือ Element อื่นๆ ด้วย */
+    body {
+        font-size: 16px; /* ปรับขนาด font พื้นฐาน */
+    }
+}
