@@ -69,6 +69,46 @@ router.get('/:studentId', async (req, res) => {
     }
 });
 
+// --- แก้ไขข้อมูลนักเรียน (GET) ---
+router.get('/edit/:studentId', async (req, res) => {
+    try {
+        const student = await Student.findOne({ studentId: req.params.studentId });
+        if (!student) {
+            return res.status(404).send('ไม่พบนักเรียน');
+        }
+        res.render('edit_student', {
+            title: `แก้ไขข้อมูล ${student.firstName}`,
+            student: student
+        });
+    } catch (err) {
+        console.error("Error fetching student for edit:", err);
+        res.status(500).send("เกิดข้อผิดพลาดในการดึงข้อมูลนักเรียน");
+    }
+});
+
+// --- จัดการการแก้ไขข้อมูลนักเรียน (POST) ---
+router.post('/edit/:studentId', async (req, res) => {
+    const { firstName, lastName, grade, phone } = req.body;
+    try {
+        const student = await Student.findOne({ studentId: req.params.studentId });
+        if (!student) {
+            return res.status(404).send('ไม่พบนักเรียน');
+        }
+
+        // อัปเดตข้อมูลนักเรียน
+        student.firstName = firstName || student.firstName;
+        student.lastName = lastName || student.lastName;
+        student.grade = grade || student.grade;
+        student.phone = phone || student.phone;
+
+        await student.save();
+        res.redirect(`/students/${student.studentId}`); // Redirect ไปหน้ารายละเอียดนักเรียน
+    } catch (err) {
+        console.error("Error updating student:", err);
+        res.status(500).send("เกิดข้อผิดพลาดในการแก้ไขข้อมูลนักเรียน");
+    }
+});
+
 router.get('/delete/:studentId', async (req, res) => {
     try {
         const student = await Student.findOne({ studentId: req.params.studentId });
