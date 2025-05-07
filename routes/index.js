@@ -30,7 +30,7 @@ function escapeCsvValue(value) {
 
 // --- แสดงหน้าหลัก (หน้าสแกน) ---
 router.get("/", (req, res) => {
-  res.render("index", { title: "ระบบฝาก-คืนมือถือ" });
+  res.render("index", { title: "หน้าหลัก" });
 });
 
 router.get("/status", async (req, res) => {
