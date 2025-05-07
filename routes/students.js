@@ -10,7 +10,7 @@ router.get('/add', (req, res) => {
 
 // --- จัดการการเพิ่มนักเรียน (POST) ---
 router.post('/add', async (req, res) => {
-    const { studentId, firstName, lastName, grade } = req.body;
+    const { studentId, firstName, lastName, grade, phone } = req.body;
     // Basic validation
     if (!studentId || !firstName || !lastName) {
         return res.render('add_student', {
@@ -26,7 +26,7 @@ router.post('/add', async (req, res) => {
                 error: `มีรหัสนักเรียน ${studentId} อยู่ในระบบแล้ว`
             });
         }
-        const newStudent = new Student({ studentId, firstName, lastName, grade });
+        const newStudent = new Student({ studentId, firstName, lastName, grade, phone });
         await newStudent.save();
         // Redirect ไปหน้ารายละเอียดนักเรียนที่เพิ่งเพิ่ม
         res.redirect(`/students/${newStudent.studentId}`);
@@ -66,6 +66,20 @@ router.get('/:studentId', async (req, res) => {
     } catch (err) {
         console.error("Error fetching student detail:", err);
         res.status(500).send("เกิดข้อผิดพลาด");
+    }
+});
+
+router.get('/delete/:studentId', async (req, res) => {
+    try {
+        const student = await Student.findOne({ studentId: req.params.studentId });
+        if (!student) {
+            return res.status(404).send('ไม่พบนักเรียน');
+        }
+        await Student.deleteOne({ studentId: req.params.studentId });
+        res.redirect('/students'); // Redirect ไปหน้ารายชื่อนักเรียนทั้งหมด
+    } catch (err) {
+        console.error("Error deleting student:", err);
+        res.status(500).send("เกิดข้อผิดพลาดในการลบนักเรียน");
     }
 });
 

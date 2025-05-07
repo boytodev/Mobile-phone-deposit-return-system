@@ -4,11 +4,12 @@ const Student = require("../models/Student");
 const PhoneLog = require("../models/PhoneLog");
 const fs = require("fs");
 const path = require("path");
+const iconv = require("iconv-lite");
 
 const logDirectory = path.join(__dirname, "..", "logs"); // สร้างโฟลเดอร์ logs ใน root project
 const logFilePath = path.join(logDirectory, "scan_transactions.csv"); // ชื่อไฟล์ log
 const csvHeader =
-  "Timestamp,StudentID,FirstName,LastName,Action,ResultingStatus\n"; // หัวข้อคอลัมน์ใน CSV
+  "Timestamp,StudentID,FirstName,LastName,Phone,Action,ResultingStatus\n"; // หัวข้อคอลัมน์ใน CSV
 
 // --- Function ช่วย Escape ค่าสำหรับ CSV (ป้องกันปัญหาถ้าข้อมูลมี comma หรือ quote) ---
 function escapeCsvValue(value) {
@@ -16,17 +17,14 @@ function escapeCsvValue(value) {
     return ""; // คืนค่าว่างถ้าเป็น null/undefined
   }
   const stringValue = String(value); // แปลงเป็น String
-  // ถ้ามี comma, newline, หรือ double quote ให้ครอบด้วย double quote
   if (
     stringValue.includes(",") ||
     stringValue.includes("\n") ||
     stringValue.includes('"')
   ) {
-    // และถ้ามี double quote อยู่แล้ว ให้เปลี่ยนเป็น double quote สองตัว (ตามมาตรฐาน CSV)
-    const escapedValue = stringValue.replace(/"/g, '""');
-    return `"${escapedValue}"`;
+    const escapedValue = stringValue.replace(/"/g, '""'); // เปลี่ยน double quotes เป็นสองตัว
+    return `"${escapedValue}"`; // ครอบด้วย double quotes
   }
-  // ถ้าไม่มีอักขระพิเศษ ก็คืนค่าเดิม
   return stringValue;
 }
 
@@ -41,7 +39,7 @@ router.get("/status", async (req, res) => {
     // 2. ใช้ .populate('student') เพื่อดึงข้อมูลของนักเรียนที่เชื่อมโยงกันมาด้วย (ชื่อ, รหัส)
     // 3. ใช้ .sort({ updatedAt: -1 }) เพื่อเรียงลำดับตามเวลาล่าสุดที่ข้อมูลถูกอัปเดต (แสดงรายการล่าสุดก่อน)
     const logs = await PhoneLog.find()
-      .populate("student", "studentId firstName lastName") // ดึงเฉพาะ field ที่ต้องการจาก Student
+      .populate("student", "studentId firstName lastName phone") // ดึงเฉพาะ field ที่ต้องการจาก Student
       .sort({ updatedAt: -1 });
 
     // Render View ใหม่ชื่อ 'status.ejs' พร้อมส่งข้อมูล logs ไปแสดงผล
@@ -129,10 +127,12 @@ router.post("/scan", async (req, res) => {
           escapeCsvValue(student.studentId),
           escapeCsvValue(student.firstName),
           escapeCsvValue(student.lastName),
+          escapeCsvValue(student.phone),
           escapeCsvValue(action), // 'check-in' or 'check-out'
           escapeCsvValue(finalStatus), // สถานะ *หลังจาก* ทำ action นี้
         ].join(",") + "\n"; // รวมเป็น String คั่นด้วย comma และขึ้นบรรทัดใหม่
 
+      const BOM = Buffer.from([0xef, 0xbb, 0xbf]);
       // 2. ตรวจสอบและสร้างโฟลเดอร์ logs ถ้ายังไม่มี
       if (!fs.existsSync(logDirectory)) {
         fs.mkdirSync(logDirectory, { recursive: true });
@@ -141,17 +141,20 @@ router.post("/scan", async (req, res) => {
 
       // 3. ตรวจสอบว่าไฟล์ CSV มีหรือยัง ถ้ายังไม่มี ให้เขียน Header ก่อน
       if (!fs.existsSync(logFilePath)) {
-        fs.writeFileSync(logFilePath, csvHeader, "utf8");
+        fs.writeFileSync(
+          logFilePath,
+          Buffer.concat([BOM, iconv.encode(csvHeader, "utf8")])
+        );
         console.log(`CSV Header written to: ${logFilePath}`);
       }
 
       // 4. เขียนข้อมูลแถวใหม่ต่อท้ายไฟล์ (Append) แบบ Asynchronous
-      fs.appendFile(logFilePath, csvRow, "utf8", (err) => {
+      // เขียนไฟล์ CSV พร้อมเพิ่ม BOM
+      fs.appendFile(logFilePath, iconv.encode(csvRow, "utf8"), (err) => {
         if (err) {
-          // สำคัญ: Log error แต่ *ไม่ควร* ทำให้ request หลักล่ม
           console.error("Error writing transaction to CSV:", err);
         } else {
-          // console.log('Transaction logged to CSV successfully.'); // Optional: แสดง log ว่าเขียนสำเร็จ
+          console.log("Transaction logged to CSV successfully.");
         }
       });
     } catch (fileError) {
@@ -175,13 +178,21 @@ router.post("/scan", async (req, res) => {
   } catch (dbError) {
     // เปลี่ยนชื่อ error variable เล็กน้อยเพื่อความชัดเจน
     console.error("Error processing scan (DB operation):", dbError);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "เกิดข้อผิดพลาดในระบบขณะประมวลผล (ฐานข้อมูล)",
-      });
+    return res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในระบบขณะประมวลผล (ฐานข้อมูล)",
+    });
   }
+});
+
+router.get("/download/logs", (req, res) => {
+  const filePath = path.join(__dirname, "../logs/scan_transactions.csv");
+  res.download(filePath, "scan_transactions.csv", (err) => {
+    if (err) {
+      console.error("Download error:", err);
+      res.status(500).send("ไม่สามารถดาวน์โหลดไฟล์ได้");
+    }
+  });
 });
 
 module.exports = router; // อย่าลืม Export router

@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public'))); // Serve static files (
 // --- Routes ---
 app.use('/', indexRoutes); // ใช้ Routes จาก routes/index.js สำหรับ path หลัก
 app.use('/students', studentRoutes); // ใช้ Routes จาก routes/students.js สำหรับ /students
-
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files (CSS, JS)
 // --- Start Server ---
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

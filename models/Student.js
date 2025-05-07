@@ -20,7 +20,11 @@ const studentSchema = new mongoose.Schema({
     grade: { // ชั้นเรียน (Optional)
         type: String,
         trim: true
-    }
+    },
+    phone: { // เบอร์โทรศัพท์ (Optional)
+        type: String,
+        trim: true
+    },
     // เพิ่ม field อื่นๆ ที่ต้องการได้
 }, { timestamps: true }); // timestamps จะเพิ่ม createdAt และ updatedAt อัตโนมัติ
 

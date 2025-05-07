@@ -4,11 +4,14 @@
 <p><strong>รหัสนักเรียน:</strong> <%= student.studentId %></p>
 <p><strong>ชื่อ:</strong> <%= student.firstName %> <%= student.lastName %></p>
 <p><strong>ชั้นเรียน:</strong> <%= student.grade || 'ไม่ได้ระบุ' %></p>
+<p><strong>โทรศัพท์:</strong> <%= student.phone %></p>
 
 <h2>QR Code (สำหรับสแกนฝาก/คืน)</h2>
 <p>ให้นักเรียนใช้ QR Code นี้ หรือพิมพ์ติดบัตร</p>
 <div class="qr-code">
-     <img src="<%= qrCodeDataUrl %>" alt="QR Code for <%= student.studentId %>">
+     <a href="<%= qrCodeDataUrl %>" download="">
+          <img src="<%= qrCodeDataUrl %>" alt="QR Code for <%= student.studentId %>">
+     </a>
 </div>
 
 <%- include('partials/footer') %>
