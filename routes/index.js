@@ -221,13 +221,24 @@ router.get("/delete/:logId", async (req, res) => {
   }
 });
 
+
 router.get("/download/logs", (req, res) => {
   const filePath = path.join(__dirname, "../logs/scan_transactions.csv");
+
   res.download(filePath, "scan_transactions.csv", (err) => {
     if (err) {
       console.error("Download error:", err);
-      res.status(500).send("ไม่สามารถดาวน์โหลดไฟล์ได้");
+      return res.status(500).send("ไม่สามารถดาวน์โหลดไฟล์ได้");
     }
+
+    // ลบไฟล์หลังจากดาวน์โหลดสำเร็จ
+    fs.unlink(filePath, (unlinkErr) => {
+      if (unlinkErr) {
+        console.error("ลบไฟล์ไม่สำเร็จ:", unlinkErr);
+      } else {
+        console.log("ลบไฟล์หลังดาวน์โหลดแล้วเรียบร้อย");
+      }
+    });
   });
 });
 
