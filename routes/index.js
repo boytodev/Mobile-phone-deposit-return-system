@@ -80,25 +80,43 @@ router.post("/scan", async (req, res) => {
     }
 
     // --- ค้นหา/สร้าง/อัปเดต PhoneLog ---
-    let phoneLog = await PhoneLog.findOne({ student: student._id });
+    // --- ค้นหา/สร้าง/อัปเดต PhoneLog ---
     let action = "";
     let message = "";
     const now = new Date(); // ใช้เวลาเดียวกันทั้งใน DB และ Log
 
+    let phoneLog = await PhoneLog.findOne({ student: student._id }).sort({
+      createdAt: -1,
+    }); // เรียงจากล่าสุดไปเก่าสุด
+
+    // ค้นหา PhoneLog ล่าสุดของนักเรียนนี้
+    // ถ้าไม่มี PhoneLog ล่าสุด (เช่น นักเรียนนี้ยังไม่เคยฝากมือถือ) จะสร้างใหม่
+    // ถ้ามี PhoneLog ล่าสุด จะเช็คสถานะว่า checked-in หรือ checked-out
+    // ถ้า checked-in จะทำการ Check-out (คืนมือถือ) และอัปเดตเวลา
+    // ถ้า checked-out จะทำการ Check-in (รับฝากมือถือ) และอัปเดตเวลา
+
+    // สร้าง PhoneLog ใหม่ทุกครั้งที่มีการ Check-in หรือ Check-out
     if (phoneLog) {
       if (phoneLog.status === "checked-out") {
         // Check-in
-        phoneLog.status = "checked-in";
-        phoneLog.lastCheckInTime = now;
-        phoneLog.lastCheckOutTime = null;
+        phoneLog = new PhoneLog({
+          student: student._id,
+          status: "checked-in",
+          lastCheckInTime: now,
+          action: "check-in",
+        });
         action = "check-in";
         message = `รับฝากมือถือของ ${student.firstName} ${student.lastName} เรียบร้อย`;
       } else {
         // Check-out
-        phoneLog.status = "checked-out";
-        phoneLog.lastCheckOutTime = now;
+        phoneLog = new PhoneLog({
+          student: student._id,
+          status: "checked-out",
+          lastCheckOutTime: now,
+          action: "check-out",
+        });
         action = "check-out";
-        message = `คืนมือถือให้ ${student.firstName} ${student.lastName} เรียบร้อย`;
+        message = `คืนมือถือของ ${student.firstName} ${student.lastName} เรียบร้อย`;
       }
     } else {
       // First check-in
@@ -106,6 +124,7 @@ router.post("/scan", async (req, res) => {
         student: student._id,
         status: "checked-in",
         lastCheckInTime: now,
+        action: "check-in",
       });
       action = "check-in";
       message = `รับฝากมือถือของ ${student.firstName} ${student.lastName} (ครั้งแรก) เรียบร้อย`;
@@ -113,6 +132,7 @@ router.post("/scan", async (req, res) => {
 
     // --- บันทึกข้อมูลลง MongoDB ---
     await phoneLog.save();
+
     const finalStatus = phoneLog.status; // เก็บ status ล่าสุดหลัง save
 
     // --- !!! เพิ่มส่วนการบันทึกลงไฟล์ CSV !!! ---
@@ -182,6 +202,22 @@ router.post("/scan", async (req, res) => {
       success: false,
       message: "เกิดข้อผิดพลาดในระบบขณะประมวลผล (ฐานข้อมูล)",
     });
+  }
+});
+
+// ---- delete phone log ----
+router.get("/delete/:logId", async (req, res) => {
+  try {
+    const logId = req.params.logId;
+    const log = await PhoneLog.findById(logId);
+    if (!log) {
+      return res.status(404).send("ไม่พบข้อมูลการฝากมือถือ");
+    }
+    await PhoneLog.deleteOne({ _id: logId });
+    res.redirect("/status"); // Redirect ไปหน้าสถานะการฝากมือถือ
+  } catch (err) {
+    console.error("Error deleting phone log:", err);
+    res.status(500).send("เกิดข้อผิดพลาดในการลบข้อมูลการฝากมือถือ");
   }
 });
 

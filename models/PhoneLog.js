@@ -5,7 +5,7 @@ const phoneLogSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Student',
         required: true,
-        unique: true // กำหนดให้ 1 นักเรียนมี Log ได้แค่ 1 อัน (เก็บสถานะล่าสุด)
+        unique: false
     },
     status: {
         type: String,

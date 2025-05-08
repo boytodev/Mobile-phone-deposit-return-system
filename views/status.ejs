@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="/css/style.css" />
 
 <%# เพิ่มปุ่มพิมพ์ ไว้ก่อนตาราง %>
-<div style="width: 100%; display: flex; justify-content: space-between;">
+<div style="width: 100%; display: flex; justify-content: space-between">
   <button
     type="button"
     id="printButton"
@@ -68,6 +68,9 @@
         <td>
           <%= new Date(log.updatedAt).toLocaleString('th-TH', { dateStyle:
           'short', timeStyle: 'medium', timeZone: 'Asia/Bangkok' }) %>
+        </td>
+        <td class="action-buttons">
+          <a href="/delete/<%= log._id%>">delete</a>
         </td>
       </tr>
       <% } %> <% }); %>

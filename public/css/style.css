@@ -80,6 +80,10 @@
          color: #000; /* ทำให้ตัวหนังสือในตารางเป็นสีดำ */
     }
 
+    .action-buttons {
+        display: none; /* ซ่อนปุ่ม Action */
+    }
+
     /* จัดการการแสดงผล Status ตอนพิมพ์ (อาจไม่แสดงสี) */
     .status-in, .status-out {
         font-weight: normal; /* อาจจะเอา bold ออก */
