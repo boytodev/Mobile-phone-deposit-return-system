@@ -40,7 +40,7 @@ router.get("/status", async (req, res) => {
     // 3. ใช้ .sort({ updatedAt: -1 }) เพื่อเรียงลำดับตามเวลาล่าสุดที่ข้อมูลถูกอัปเดต (แสดงรายการล่าสุดก่อน)
     const logs = await PhoneLog.find()
       .populate("student", "studentId firstName lastName phone") // ดึงเฉพาะ field ที่ต้องการจาก Student
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: 1 });
 
     // Render View ใหม่ชื่อ 'status.ejs' พร้อมส่งข้อมูล logs ไปแสดงผล
     res.render("status", {

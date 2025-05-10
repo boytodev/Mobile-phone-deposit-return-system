@@ -6,8 +6,9 @@
     /* ซ่อนส่วนที่ไม่ต้องการพิมพ์ */
     nav,             /* ซ่อน Navigation */
     footer,          /* ซ่อน Footer */
-    #printButton,    /* ซ่อนปุ่มพิมพ์เอง */
-    script           /* ซ่อน Script Tags */
+    #printButton,
+    #exportButton,    /* ซ่อนปุ่มพิมพ์เอง */
+    script    /* ซ่อน Script Tags */
     {
         display: none !important; /* ใช้ !important เพื่อให้แน่ใจว่าถูกซ่อน */
     }
@@ -75,7 +76,7 @@
 
     th, td {
         border: 1px solid #666; /* เส้นขอบ cell */
-        padding: 5px 8px; /* ปรับ padding */
+        padding: 2px 5px; /* ปรับ padding */
         text-align: left;
          color: #000; /* ทำให้ตัวหนังสือในตารางเป็นสีดำ */
     }
