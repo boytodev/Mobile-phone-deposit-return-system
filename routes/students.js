@@ -56,7 +56,13 @@ router.get('/:studentId', async (req, res) => {
         }
 
         // สร้าง QR Code เป็น Data URL
-        const qrCodeDataUrl = await QRCode.toDataURL(student.studentId);
+        const qrCodeDataUrl = await QRCode.toDataURL(student.studentId, {
+            errorCorrectionLevel: 'H',
+            type: 'image/png',
+            width: 500,
+            margin: 1,
+            scale: 20
+        });
 
         res.render('student_detail', {
             title: `รายละเอียด ${student.firstName}`,
